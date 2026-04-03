@@ -1,226 +1,135 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>復健紀錄系統 — Rehab Tracker</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&family=Noto+Serif+TC:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-<!-- 1. React & ReactDOM -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&family=Noto+Serif+TC:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js"></script>
-    <script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js"></script>
+<script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#FAF8F5;font-family:'Noto Sans TC',sans-serif;color:#1A1A1A;-webkit-font-smoothing:antialiased}
 input,select,textarea,button{font-family:'Noto Sans TC',sans-serif}
 @keyframes fadeUp{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-thumb{background:#D5D0C8;border-radius:4px}
 </style>
 </head>
 <body>
 <div id="root"></div>
-<script type="text/babel">
-const { useState, useEffect, useCallback } = React;
-const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } = Recharts;
+<script>
+(function(){
+"use strict";
+var e=React.createElement,h=React.useState,ue=React.useEffect;
+var LC=Recharts.LineChart,L=Recharts.Line,XA=Recharts.XAxis,YA=Recharts.YAxis,CG=Recharts.CartesianGrid,TT=Recharts.Tooltip,RC=Recharts.ResponsiveContainer,BC=Recharts.BarChart,BA=Recharts.Bar,LG=Recharts.Legend,RDC=Recharts.RadarChart,RD=Recharts.Radar,PG=Recharts.PolarGrid,PAA=Recharts.PolarAngleAxis,PRA=Recharts.PolarRadiusAxis;
 
-const T = {
-  bg:"#FAF8F5", card:"#FFFFFF", inputBg:"#F5F2ED",
-  text:"#1A1A1A", textSec:"#6B6560", textMuted:"#A09A93",
-  accent:"#4A6B5D", green:"#6B8F5E", red:"#B85C4A", yellow:"#C4973B",
-  border:"#E8E4DE", shadow:"0 1px 4px rgba(160,154,147,0.12)",
-};
+var T={bg:"#FAF8F5",card:"#FFFFFF",inputBg:"#F5F2ED",text:"#1A1A1A",textSec:"#6B6560",textMuted:"#A09A93",accent:"#4A6B5D",green:"#6B8F5E",red:"#B85C4A",yellow:"#C4973B",border:"#E8E4DE",shadow:"0 1px 4px rgba(160,154,147,0.12)"};
+var ML={"需全協助":1,"需部分協助":2,"可自行完成":3};
+var WL={"無法行走":0,"需助行器+人扶":1,"需助行器":2,"可獨立短距離":3,"可獨立行走":4};
+var MM={"平穩":4,"有點低落":3,"煩躁易怒":2,"明顯沮喪":1};
+var SM={"好":3,"普通":2,"差":1};
+var CM={"積極":3,"普通":2,"抗拒":1};
+var GM={"無動作":0,"微動":1,"可握不可持":2,"可握持":3};
+var AM={"無法":0,"微動":1,"可主動但弱":2,"接近正常":3};
+var BM={"第一期":1,"第二期":2,"第三期":3,"第四期":4,"第五期":5,"第六期":6};
+var SK="rehab-records-v5";
 
-const ML = {"需全協助":1,"需部分協助":2,"可自行完成":3};
-const WL = {"無法行走":0,"需助行器+人扶":1,"需助行器":2,"可獨立短距離":3,"可獨立行走":4};
-const MM = {"平穩":4,"有點低落":3,"煩躁易怒":2,"明顯沮喪":1};
-const SM = {"好":3,"普通":2,"差":1};
-const CM = {"積極":3,"普通":2,"抗拒":1};
-const GM = {"無動作":0,"微動":1,"可握不可持":2,"可握持":3};
-const AM = {"無法":0,"微動":1,"可主動但弱":2,"接近正常":3};
-const BM = {"第一期":1,"第二期":2,"第三期":3,"第四期":4,"第五期":5,"第六期":6};
+function defRec(){return{date:new Date().toISOString().split("T")[0],pt:"",ot:"",selfPractice:"",other:"",upperLimb:"",lowerLimb:"",muscleTone:"正常",brunnUpper:"第二期",brunnFinger:"第一期",brunnLower:"第二期",shoulderRom:"",gripStrength:"無動作",ankleDorsi:"無法",painScore:0,painLocation:"",painTiming:"",rollOver:"需全協助",sitUp:"需全協助",standing:"需全協助",walking:"無法行走",eating:"慣用手自行",mood:"平穩",sleep:"好",cooperation:"積極",notes:""};}
 
-const SK = "rehab-records-v4";
-
-const defRec = () => ({
-  date: new Date().toISOString().split("T")[0],
-  pt:"", ot:"", selfPractice:"", other:"",
-  upperLimb:"", lowerLimb:"", muscleTone:"正常",
-  brunnUpper:"第二期", brunnFinger:"第一期", brunnLower:"第二期",
-  shoulderRom:"", gripStrength:"無動作", ankleDorsi:"無法",
-  painScore:0, painLocation:"", painTiming:"",
-  rollOver:"需全協助", sitUp:"需全協助", standing:"需全協助",
-  walking:"無法行走", eating:"慣用手自行",
-  mood:"平穩", sleep:"好", cooperation:"積極", notes:"",
-});
-
-function genDemo() {
-  const base = new Date("2026-03-12T00:00:00");
-  const P = [
-    {pt:"被動關節活動（左上下肢全範圍）、床上翻身誘發",ot:"左手感覺刺激、坐姿平衡初階",self:"床上深呼吸練習",other:"",upper:"左肩被動可全範圍，主動僅微抬",lower:"左髖膝被動可彎曲，主動無明顯動作",tone:"偏緊",bU:"第一期",bF:"第一期",bL:"第二期",rom:"前屈被動160度，主動約10度",grip:"無動作",ankle:"無法",pain:3,pL:"左肩",pT:"被動外展末端",roll:"需全協助",sit:"需全協助",stand:"需全協助",walk:"無法行走",mood:"明顯沮喪",sleep:"差",coop:"抗拒",note:"第一次進復健病房，對環境不適應，情緒低落"},
-    {pt:"被動關節活動、翻身練習、坐姿支撐",ot:"左手觸覺辨識、餐具輔助指導",self:"左手握軟球嘗試",other:"",upper:"左肩被動外展時有阻力感",lower:"左膝被動伸直時有輕微痙攣",tone:"偏緊",bU:"第一期",bF:"第一期",bL:"第二期",rom:"前屈被動160度，主動約15度",grip:"無動作",ankle:"微動",pain:4,pL:"左肩前側",pT:"被動外展超過90度時",roll:"需全協助",sit:"需全協助",stand:"需全協助",walk:"無法行走",mood:"明顯沮喪",sleep:"差",coop:"抗拒",note:"疼痛讓他更抗拒，下午稍願意做坐姿練習"},
-    {pt:"被動+主動協助關節活動、坐姿平衡、輪椅移位",ot:"左手粗大抓握嘗試、坐姿桌上活動",self:"坐姿維持10分鐘",other:"",upper:"左肩可微微主動前屈",lower:"左髖可做微弱屈曲動作",tone:"偏緊",bU:"第二期",bF:"第一期",bL:"第二期",rom:"前屈主動約20度",grip:"無動作",ankle:"微動",pain:3,pL:"左肩",pT:"主動抬舉時",roll:"需全協助",sit:"需部分協助",stand:"需全協助",walk:"無法行走",mood:"有點低落",sleep:"普通",coop:"普通",note:"左肩出現主動動作，他自己也注意到了"},
-    {pt:"坐站轉移、站立桌站立5分鐘、被動伸展",ot:"左手抓放積木、翻撲克牌",self:"床上左腳抬腿",other:"",upper:"左手指有輕微屈曲反應",lower:"站立時左腳可踩地但無法撐重",tone:"偏緊",bU:"第二期",bF:"第二期",bL:"第二期",rom:"前屈主動約25度，外展約15度",grip:"微動",ankle:"微動",pain:3,pL:"左肩",pT:"做外展動作時",roll:"需部分協助",sit:"需部分協助",stand:"需全協助",walk:"無法行走",mood:"有點低落",sleep:"普通",coop:"普通",note:"手指出現屈曲反應，治療師說是好徵兆"},
-    {pt:"站立平衡初階、重心轉移、坐站訓練",ot:"左手木釘練習、輪椅煞車操作",self:"坐姿維持15分鐘",other:"",upper:"左肩主動前屈增加，肘可微彎",lower:"左膝可微彎曲，站立可撐少量重量",tone:"偏緊",bU:"第二期",bF:"第二期",bL:"第二期",rom:"前屈主動約35度，外展約20度",grip:"微動",ankle:"微動",pain:2,pL:"左肩",pT:"末端角度時",roll:"需部分協助",sit:"需部分協助",stand:"需全協助",walk:"無法行走",mood:"平穩",sleep:"普通",coop:"積極",note:"情緒明顯好轉，主動說想多練一點"},
-    {pt:"休息日，僅輕度被動伸展",ot:"休息",self:"床上翻身自主練習",other:"",upper:"維持",lower:"維持",tone:"正常",bU:"第二期",bF:"第二期",bL:"第二期",rom:"前屈主動約35度",grip:"微動",ankle:"微動",pain:2,pL:"左肩",pT:"被動伸展輕微",roll:"需部分協助",sit:"需部分協助",stand:"需全協助",walk:"無法行走",mood:"平穩",sleep:"好",coop:"積極",note:"週末休息，精神不錯"},
-    {pt:"站立平衡進階、四角拐站立嘗試、髖外展訓練",ot:"左手握放、扣大鈕扣嘗試",self:"左腳踩踏練習",other:"",upper:"肘關節彎曲角度增加",lower:"站立可撐約30%體重",tone:"偏緊",bU:"第二期",bF:"第二期",bL:"第三期",rom:"前屈主動約40度，外展約25度",grip:"微動",ankle:"可主動但弱",pain:2,pL:"左肩前側",pT:"主動外展時",roll:"需部分協助",sit:"需部分協助",stand:"需部分協助",walk:"無法行走",mood:"平穩",sleep:"好",coop:"積極",note:"下肢布朗斯壯進到第三期！站立比較穩了"},
-    {pt:"四角拐輔助站立、步態前期訓練、左膝控制",ot:"左手抓放木釘、杯子端起練習",self:"坐姿重心轉移",other:"",upper:"左手可做全手抓握但力量弱",lower:"左膝站立可維持伸直約10秒",tone:"偏緊",bU:"第二期",bF:"第二期",bL:"第三期",rom:"前屈主動約45度，外展約30度",grip:"可握不可持",ankle:"可主動但弱",pain:2,pL:"左肩",pT:"外展超過30度",roll:"需部分協助",sit:"可自行完成",stand:"需部分協助",walk:"無法行走",mood:"平穩",sleep:"好",coop:"積極",note:"坐起可以自己完成了！握力進步到可握不可持"},
-    {pt:"平行桿內步行練習（首次）、重心前後轉移",ot:"左手翻頁、穿脫上衣輔助",self:"站立練習5分鐘×2",other:"",upper:"左手抓握可維持約2秒",lower:"平行桿內可跨出左腳一步",tone:"偏緊",bU:"第三期",bF:"第二期",bL:"第三期",rom:"前屈主動約50度，外展約30度",grip:"可握不可持",ankle:"可主動但弱",pain:3,pL:"左肩、左膝",pT:"步行練習後左膝痠",roll:"可自行完成",sit:"可自行完成",stand:"需部分協助",walk:"需助行器+人扶",mood:"平穩",sleep:"好",coop:"積極",note:"第一次在平行桿裡走了三步！翻身也自己完成了"},
-    {pt:"平行桿步行延長、左腳踩踏30下、墊上伸展",ot:"左手夾衣夾、旋轉瓶蓋",self:"站立平衡、左手握放軟球",other:"",upper:"左肩前屈更順暢",lower:"平行桿步行約5公尺",tone:"偏緊",bU:"第三期",bF:"第二期",bL:"第三期",rom:"前屈主動約55度，外展約35度",grip:"可握不可持",ankle:"可主動但弱",pain:2,pL:"左膝",pT:"步行量增加後",roll:"可自行完成",sit:"可自行完成",stand:"需部分協助",walk:"需助行器+人扶",mood:"平穩",sleep:"好",coop:"積極",note:"步行距離增加，左膝微痠但可接受"},
-    {pt:"四角拐步行（離開平行桿）、階梯踏步模擬",ot:"左手持杯喝水、扣小鈕扣",self:"站立10分鐘",other:"",upper:"左肘可主動彎曲約90度",lower:"四角拐+一人扶可走約8公尺",tone:"偏緊",bU:"第三期",bF:"第二期",bL:"第三期",rom:"前屈主動約60度，外展約35度",grip:"可握不可持",ankle:"可主動但弱",pain:3,pL:"左膝、左踝",pT:"步行結束後15分鐘內",roll:"可自行完成",sit:"可自行完成",stand:"需部分協助",walk:"需助行器+人扶",mood:"平穩",sleep:"普通",coop:"積極",note:"從平行桿畢業了！用四角拐走路"},
-    {pt:"四角拐步行加長、坐站速度訓練",ot:"進食訓練（左手輔助扶碗）、擰毛巾",self:"站立重心轉移",other:"",upper:"左手可持空杯約5秒",lower:"四角拐步行約12公尺",tone:"偏緊",bU:"第三期",bF:"第二期",bL:"第三期",rom:"前屈主動約60度，外展約40度",grip:"可握不可持",ankle:"可主動但弱",pain:2,pL:"左膝",pT:"長距離步行後",roll:"可自行完成",sit:"可自行完成",stand:"需部分協助",walk:"需助行器+人扶",mood:"平穩",sleep:"好",coop:"積極",note:"左手可以扶碗了！吃飯有輔助功能了"},
-    {pt:"四角拐步行、左腳單站嘗試、髖外展阻力訓練",ot:"左手持湯匙嘗試、雙手協調",self:"左手抓放、站立15分鐘",other:"",upper:"左手可持湯匙但不穩",lower:"左腳單站可撐約2秒",tone:"偏緊",bU:"第三期",bF:"第三期",bL:"第三期",rom:"前屈主動約65度，外展約40度",grip:"可握持",ankle:"可主動但弱",pain:2,pL:"左肩",pT:"主動外展末端",roll:"可自行完成",sit:"可自行完成",stand:"需部分協助",walk:"需助行器+人扶",mood:"平穩",sleep:"好",coop:"積極",note:"手指布朗斯壯進到第三期！握力可握持。大進步的一天"},
-    {pt:"休息日，輕度伸展",ot:"休息",self:"自主站立、左手握球",other:"",upper:"維持",lower:"維持",tone:"正常",bU:"第三期",bF:"第三期",bL:"第三期",rom:"前屈主動約65度",grip:"可握持",ankle:"可主動但弱",pain:1,pL:"",pT:"",roll:"可自行完成",sit:"可自行完成",stand:"需部分協助",walk:"需助行器+人扶",mood:"平穩",sleep:"好",coop:"積極",note:"休息日，狀態穩定"},
-    {pt:"四角拐步行20m、上下一階樓梯、動態平衡",ot:"穿褲子練習、左手擰毛巾",self:"走廊來回一趟",other:"",upper:"左手可持較重物品約3秒",lower:"上一階樓梯可完成",tone:"偏緊",bU:"第三期",bF:"第三期",bL:"第三期",rom:"前屈主動約70度，外展約45度",grip:"可握持",ankle:"可主動但弱",pain:2,pL:"左膝",pT:"上樓梯時",roll:"可自行完成",sit:"可自行完成",stand:"可自行完成",walk:"需助行器+人扶",mood:"平穩",sleep:"好",coop:"積極",note:"站立可以自己完成了！上樓梯首次成功"},
-    {pt:"四角拐步行25m、減少攙扶測試、左腳控制",ot:"左手寫字嘗試、開關門把",self:"自主步行練習",other:"",upper:"肩膀活動範圍持續增加",lower:"步行時攙扶力道可減少",tone:"偏緊",bU:"第三期",bF:"第三期",bL:"第四期",rom:"前屈主動約75度，外展約50度",grip:"可握持",ankle:"可主動但弱",pain:2,pL:"左踝",pT:"長距離步行後",roll:"可自行完成",sit:"可自行完成",stand:"可自行完成",walk:"需助行器+人扶",mood:"平穩",sleep:"好",coop:"積極",note:"下肢布朗斯壯進到第四期！治療師說進步不錯"},
-    {pt:"四角拐步行（減少扶持）、左側單腳站5秒目標",ot:"雙手協調折衣服、按電梯按鈕",self:"走廊步行兩趟",other:"",upper:"左手抓握持續時間增加",lower:"左腳單站約3秒",tone:"偏緊",bU:"第三期",bF:"第三期",bL:"第四期",rom:"前屈主動約75度，外展約50度",grip:"可握持",ankle:"可主動但弱",pain:5,pL:"左肩",pT:"外展超過50度後持續痠痛",roll:"可自行完成",sit:"可自行完成",stand:"可自行完成",walk:"需助行器+人扶",mood:"有點低落",sleep:"普通",coop:"普通",note:"今天左肩特別痛，可能昨天練太多"},
-    {pt:"減量訓練、肩部冰敷+輕度被動活動",ot:"減量，下肢功能為主",self:"減少上肢練習",other:"",upper:"因疼痛減少訓練量",lower:"維持步行能力",tone:"偏緊",bU:"第三期",bF:"第三期",bL:"第四期",rom:"前屈主動約65度（因痛減少）",grip:"可握持",ankle:"可主動但弱",pain:6,pL:"左肩前側與外側",pT:"靜止時也有隱痛",roll:"可自行完成",sit:"可自行完成",stand:"可自行完成",walk:"需助行器+人扶",mood:"有點低落",sleep:"差",coop:"普通",note:"肩膀痛影響睡眠，治療師建議上肢減量"},
-    {pt:"下肢為主、上肢僅被動伸展",ot:"下肢功能訓練",self:"步行練習",other:"",upper:"暫停主動訓練",lower:"步行穩定性維持",tone:"偏緊",bU:"第三期",bF:"第三期",bL:"第四期",rom:"前屈主動約60度",grip:"可握持",ankle:"可主動但弱",pain:4,pL:"左肩",pT:"被動外展末端",roll:"可自行完成",sit:"可自行完成",stand:"可自行完成",walk:"需助行器+人扶",mood:"平穩",sleep:"普通",coop:"積極",note:"肩痛減緩，配合度回來了"},
-    {pt:"恢復正常訓練量、四角拐步行30m、上下2階樓梯",ot:"左手恢復抓握訓練、穿襪子",self:"自主步行+左手日常活動",other:"",upper:"肩痛改善，恢復主動訓練",lower:"步行距離新紀錄30公尺",tone:"偏緊",bU:"第三期",bF:"第三期",bL:"第四期",rom:"前屈主動約70度，外展約45度",grip:"可握持",ankle:"接近正常",pain:2,pL:"左肩",pT:"僅外展末端輕微",roll:"可自行完成",sit:"可自行完成",stand:"可自行完成",walk:"需助行器",mood:"平穩",sleep:"好",coop:"積極",note:"踝背屈接近正常！步行不再需要人扶，只需四角拐。30公尺新紀錄！"},
-  ];
-  return P.map((p,i) => {
-    const d = new Date(base); d.setDate(d.getDate()+i);
-    return { date:d.toISOString().split("T")[0], pt:p.pt, ot:p.ot, selfPractice:p.self, other:p.other, upperLimb:p.upper, lowerLimb:p.lower, muscleTone:p.tone, brunnUpper:p.bU, brunnFinger:p.bF, brunnLower:p.bL, shoulderRom:p.rom, gripStrength:p.grip, ankleDorsi:p.ankle, painScore:p.pain, painLocation:p.pL, painTiming:p.pT, rollOver:p.roll, sitUp:p.sit, standing:p.stand, walking:p.walk, eating:"慣用手自行", mood:p.mood, sleep:p.sleep, cooperation:p.coop, notes:p.note };
-  });
+function genDemo(){
+var base=new Date("2026-03-12T00:00:00");
+var P=[
+{pt:"被動關節活動（左上下肢全範圍）、床上翻身誘發",ot:"左手感覺刺激、坐姿平衡初階",self:"床上深呼吸練習",other:"",upper:"左肩被動可全範圍，主動僅微抬",lower:"左髖膝被動可彎曲，主動無明顯動作",tone:"偏緊",bU:"第一期",bF:"第一期",bL:"第二期",rom:"前屈被動160度，主動約10度",grip:"無動作",ankle:"無法",pain:3,pL:"左肩",pT:"被動外展末端",roll:"需全協助",sit:"需全協助",stand:"需全協助",walk:"無法行走",mood:"明顯沮喪",sleep:"差",coop:"抗拒",note:"第一次進復健病房，對環境不適應"},
+{pt:"被動關節活動、翻身練習、坐姿支撐",ot:"左手觸覺辨識、餐具輔助指導",self:"左手握軟球嘗試",other:"",upper:"左肩被動外展時有阻力感",lower:"左膝被動伸直時有輕微痙攣",tone:"偏緊",bU:"第一期",bF:"第一期",bL:"第二期",rom:"前屈被動160度，主動約15度",grip:"無動作",ankle:"微動",pain:4,pL:"左肩前側",pT:"被動外展超過90度時",roll:"需全協助",sit:"需全協助",stand:"需全協助",walk:"無法行走",mood:"明顯沮喪",sleep:"差",coop:"抗拒",note:"疼痛讓他更抗拒，下午稍願意做坐姿練習"},
+{pt:"被動+主動協助關節活動、坐姿平衡、輪椅移位",ot:"左手粗大抓握嘗試、坐姿桌上活動",self:"坐姿維持10分鐘",other:"",upper:"左肩可微微主動前屈",lower:"左髖可做微弱屈曲動作",tone:"偏緊",bU:"第二期",bF:"第一期",bL:"第二期",rom:"前屈主動約20度",grip:"無動作",ankle:"微動",pain:3,pL:"左肩",pT:"主動抬舉時",roll:"需全協助",sit:"需部分協助",stand:"需全協助",walk:"無法行走",mood:"有點低落",sleep:"普通",coop:"普通",note:"左肩出現主動動作，他自己也注意到了"},
+{pt:"坐站轉移、站立桌站立5分鐘、被動伸展",ot:"左手抓放積木、翻撲克牌",self:"床上左腳抬腿",other:"",upper:"左手指有輕微屈曲反應",lower:"站立時左腳可踩地但無法撐重",tone:"偏緊",bU:"第二期",bF:"第二期",bL:"第二期",rom:"前屈主動約25度，外展約15度",grip:"微動",ankle:"微動",pain:3,pL:"左肩",pT:"做外展動作時",roll:"需部分協助",sit:"需部分協助",stand:"需全協助",walk:"無法行走",mood:"有點低落",sleep:"普通",coop:"普通",note:"手指出現屈曲反應，治療師說是好徵兆"},
+{pt:"站立平衡初階、重心轉移、坐站訓練",ot:"左手木釘練習、輪椅煞車操作",self:"坐姿維持15分鐘",other:"",upper:"左肩主動前屈增加，肘可微彎",lower:"左膝可微彎曲，站立可撐少量重量",tone:"偏緊",bU:"第二期",bF:"第二期",bL:"第二期",rom:"前屈主動約35度，外展約20度",grip:"微動",ankle:"微動",pain:2,pL:"左肩",pT:"末端角度時",roll:"需部分協助",sit:"需部分協助",stand:"需全協助",walk:"無法行走",mood:"平穩",sleep:"普通",coop:"積極",note:"情緒明顯好轉，主動說想多練一點"},
+{pt:"休息日，僅輕度被動伸展",ot:"休息",self:"床上翻身自主練習",other:"",upper:"維持",lower:"維持",tone:"正常",bU:"第二期",bF:"第二期",bL:"第二期",rom:"前屈主動約35度",grip:"微動",ankle:"微動",pain:2,pL:"左肩",pT:"被動伸展輕微",roll:"需部分協助",sit:"需部分協助",stand:"需全協助",walk:"無法行走",mood:"平穩",sleep:"好",coop:"積極",note:"週末休息，精神不錯"},
+{pt:"站立平衡進階、四角拐站立嘗試、髖外展訓練",ot:"左手握放、扣大鈕扣嘗試",self:"左腳踩踏練習",other:"",upper:"肘關節彎曲角度增加",lower:"站立可撐約30%體重",tone:"偏緊",bU:"第二期",bF:"第二期",bL:"第三期",rom:"前屈主動約40度，外展約25度",grip:"微動",ankle:"可主動但弱",pain:2,pL:"左肩前側",pT:"主動外展時",roll:"需部分協助",sit:"需部分協助",stand:"需部分協助",walk:"無法行走",mood:"平穩",sleep:"好",coop:"積極",note:"下肢布朗斯壯進到第三期！"},
+{pt:"四角拐輔助站立、步態前期訓練、左膝控制",ot:"左手抓放木釘、杯子端起練習",self:"坐姿重心轉移",other:"",upper:"左手可做全手抓握但力量弱",lower:"左膝站立可維持伸直約10秒",tone:"偏緊",bU:"第二期",bF:"第二期",bL:"第三期",rom:"前屈主動約45度，外展約30度",grip:"可握不可持",ankle:"可主動但弱",pain:2,pL:"左肩",pT:"外展超過30度",roll:"需部分協助",sit:"可自行完成",stand:"需部分協助",walk:"無法行走",mood:"平穩",sleep:"好",coop:"積極",note:"坐起自己完成了！握力進步到可握不可持"},
+{pt:"平行桿內步行練習（首次）、重心前後轉移",ot:"左手翻頁、穿脫上衣輔助",self:"站立練習5分鐘×2",other:"",upper:"左手抓握可維持約2秒",lower:"平行桿內可跨出左腳一步",tone:"偏緊",bU:"第三期",bF:"第二期",bL:"第三期",rom:"前屈主動約50度，外展約30度",grip:"可握不可持",ankle:"可主動但弱",pain:3,pL:"左肩、左膝",pT:"步行後左膝痠",roll:"可自行完成",sit:"可自行完成",stand:"需部分協助",walk:"需助行器+人扶",mood:"平穩",sleep:"好",coop:"積極",note:"第一次在平行桿裡走了三步！"},
+{pt:"平行桿步行延長、左腳踩踏30下、墊上伸展",ot:"左手夾衣夾、旋轉瓶蓋",self:"站立平衡、左手握放軟球",other:"",upper:"左肩前屈更順暢",lower:"平行桿步行約5公尺",tone:"偏緊",bU:"第三期",bF:"第二期",bL:"第三期",rom:"前屈主動約55度，外展約35度",grip:"可握不可持",ankle:"可主動但弱",pain:2,pL:"左膝",pT:"步行量增加後",roll:"可自行完成",sit:"可自行完成",stand:"需部分協助",walk:"需助行器+人扶",mood:"平穩",sleep:"好",coop:"積極",note:"步行距離增加，左膝微痠但可接受"},
+{pt:"四角拐步行（離開平行桿）、階梯踏步模擬",ot:"左手持杯喝水、扣小鈕扣",self:"站立10分鐘",other:"",upper:"左肘可主動彎曲約90度",lower:"四角拐+一人扶可走約8公尺",tone:"偏緊",bU:"第三期",bF:"第二期",bL:"第三期",rom:"前屈主動約60度，外展約35度",grip:"可握不可持",ankle:"可主動但弱",pain:3,pL:"左膝、左踝",pT:"步行結束後15分鐘內",roll:"可自行完成",sit:"可自行完成",stand:"需部分協助",walk:"需助行器+人扶",mood:"平穩",sleep:"普通",coop:"積極",note:"從平行桿畢業了！用四角拐走路"},
+{pt:"四角拐步行加長、坐站速度訓練",ot:"進食訓練（左手輔助扶碗）、擰毛巾",self:"站立重心轉移",other:"",upper:"左手可持空杯約5秒",lower:"四角拐步行約12公尺",tone:"偏緊",bU:"第三期",bF:"第二期",bL:"第三期",rom:"前屈主動約60度，外展約40度",grip:"可握不可持",ankle:"可主動但弱",pain:2,pL:"左膝",pT:"長距離步行後",roll:"可自行完成",sit:"可自行完成",stand:"需部分協助",walk:"需助行器+人扶",mood:"平穩",sleep:"好",coop:"積極",note:"左手可以扶碗了！"},
+{pt:"四角拐步行、左腳單站嘗試、髖外展阻力",ot:"左手持湯匙嘗試、雙手協調",self:"左手抓放、站立15分鐘",other:"",upper:"左手可持湯匙但不穩",lower:"左腳單站可撐約2秒",tone:"偏緊",bU:"第三期",bF:"第三期",bL:"第三期",rom:"前屈主動約65度，外展約40度",grip:"可握持",ankle:"可主動但弱",pain:2,pL:"左肩",pT:"主動外展末端",roll:"可自行完成",sit:"可自行完成",stand:"需部分協助",walk:"需助行器+人扶",mood:"平穩",sleep:"好",coop:"積極",note:"手指布朗斯壯進到第三期！握力可握持"},
+{pt:"休息日，輕度伸展",ot:"休息",self:"自主站立、左手握球",other:"",upper:"維持",lower:"維持",tone:"正常",bU:"第三期",bF:"第三期",bL:"第三期",rom:"前屈主動約65度",grip:"可握持",ankle:"可主動但弱",pain:1,pL:"",pT:"",roll:"可自行完成",sit:"可自行完成",stand:"需部分協助",walk:"需助行器+人扶",mood:"平穩",sleep:"好",coop:"積極",note:"休息日，狀態穩定"},
+{pt:"四角拐步行20m、上下一階樓梯、動態平衡",ot:"穿褲子練習、左手擰毛巾",self:"走廊來回一趟",other:"",upper:"左手可持較重物品約3秒",lower:"上一階樓梯可完成",tone:"偏緊",bU:"第三期",bF:"第三期",bL:"第三期",rom:"前屈主動約70度，外展約45度",grip:"可握持",ankle:"可主動但弱",pain:2,pL:"左膝",pT:"上樓梯時",roll:"可自行完成",sit:"可自行完成",stand:"可自行完成",walk:"需助行器+人扶",mood:"平穩",sleep:"好",coop:"積極",note:"站立可以自己完成了！"},
+{pt:"四角拐步行25m、減少攙扶測試、左腳控制",ot:"左手寫字嘗試、開關門把",self:"自主步行練習",other:"",upper:"肩膀活動範圍持續增加",lower:"步行時攙扶力道可減少",tone:"偏緊",bU:"第三期",bF:"第三期",bL:"第四期",rom:"前屈主動約75度，外展約50度",grip:"可握持",ankle:"可主動但弱",pain:2,pL:"左踝",pT:"長距離步行後",roll:"可自行完成",sit:"可自行完成",stand:"可自行完成",walk:"需助行器+人扶",mood:"平穩",sleep:"好",coop:"積極",note:"下肢布朗斯壯進到第四期！"},
+{pt:"四角拐步行、單腳站目標",ot:"雙手協調折衣服",self:"走廊步行兩趟",other:"",upper:"左手抓握持續時間增加",lower:"左腳單站約3秒",tone:"偏緊",bU:"第三期",bF:"第三期",bL:"第四期",rom:"前屈主動約75度，外展約50度",grip:"可握持",ankle:"可主動但弱",pain:5,pL:"左肩",pT:"外展超過50度後持續痠痛",roll:"可自行完成",sit:"可自行完成",stand:"可自行完成",walk:"需助行器+人扶",mood:"有點低落",sleep:"普通",coop:"普通",note:"今天左肩特別痛"},
+{pt:"減量訓練、肩部冰敷+輕度被動活動",ot:"減量，下肢為主",self:"減少上肢練習",other:"",upper:"因疼痛減少訓練量",lower:"維持步行能力",tone:"偏緊",bU:"第三期",bF:"第三期",bL:"第四期",rom:"前屈主動約65度（因痛減少）",grip:"可握持",ankle:"可主動但弱",pain:6,pL:"左肩前側與外側",pT:"靜止時也有隱痛",roll:"可自行完成",sit:"可自行完成",stand:"可自行完成",walk:"需助行器+人扶",mood:"有點低落",sleep:"差",coop:"普通",note:"肩膀痛影響睡眠"},
+{pt:"下肢為主、上肢僅被動伸展",ot:"下肢功能訓練",self:"步行練習",other:"",upper:"暫停主動訓練",lower:"步行穩定性維持",tone:"偏緊",bU:"第三期",bF:"第三期",bL:"第四期",rom:"前屈主動約60度",grip:"可握持",ankle:"可主動但弱",pain:4,pL:"左肩",pT:"被動外展末端",roll:"可自行完成",sit:"可自行完成",stand:"可自行完成",walk:"需助行器+人扶",mood:"平穩",sleep:"普通",coop:"積極",note:"肩痛減緩，配合度回來了"},
+{pt:"恢復訓練量、四角拐步行30m、上下2階樓梯",ot:"左手恢復抓握訓練、穿襪子",self:"自主步行+左手日常活動",other:"",upper:"肩痛改善，恢復主動訓練",lower:"步行距離新紀錄30公尺",tone:"偏緊",bU:"第三期",bF:"第三期",bL:"第四期",rom:"前屈主動約70度，外展約45度",grip:"可握持",ankle:"接近正常",pain:2,pL:"左肩",pT:"僅外展末端輕微",roll:"可自行完成",sit:"可自行完成",stand:"可自行完成",walk:"需助行器",mood:"平穩",sleep:"好",coop:"積極",note:"踝背屈接近正常！步行不再需要人扶。30公尺新紀錄！"}
+];
+return P.map(function(p,i){var d=new Date(base);d.setDate(d.getDate()+i);return{date:d.toISOString().split("T")[0],pt:p.pt,ot:p.ot,selfPractice:p.self,other:p.other,upperLimb:p.upper,lowerLimb:p.lower,muscleTone:p.tone,brunnUpper:p.bU,brunnFinger:p.bF,brunnLower:p.bL,shoulderRom:p.rom,gripStrength:p.grip,ankleDorsi:p.ankle,painScore:p.pain,painLocation:p.pL,painTiming:p.pT,rollOver:p.roll,sitUp:p.sit,standing:p.stand,walking:p.walk,eating:"慣用手自行",mood:p.mood,sleep:p.sleep,cooperation:p.coop,notes:p.note};});
 }
 
-const fmt = d => { const dt=new Date(d+"T00:00:00"); return `${dt.getMonth()+1}/${dt.getDate()}`; };
-const daysSince = d => Math.floor((new Date()-new Date(d+"T00:00:00"))/86400000);
-const weekOf = d => { const dt=new Date(d+"T00:00:00"); const day=dt.getDay(); const diff=dt.getDate()-day+(day===0?-6:1); return new Date(dt.setDate(diff)).toISOString().split("T")[0]; };
+function fmt(d){var dt=new Date(d+"T00:00:00");return(dt.getMonth()+1)+"/"+dt.getDate();}
+function daysSince(d){return Math.floor((new Date()-new Date(d+"T00:00:00"))/86400000);}
+function weekOf(d){var dt=new Date(d+"T00:00:00");var day=dt.getDay();var diff=dt.getDate()-day+(day===0?-6:1);return new Date(dt.setDate(diff)).toISOString().split("T")[0];}
+function tag(text,bg,col){return e("span",{style:{padding:"2px 8px",borderRadius:14,fontSize:11,fontWeight:600,background:bg,color:col}},text);}
 
-function Tabs({tabs,active,onChange}) {
-  return React.createElement("div", {style:{display:"flex",gap:0,overflowX:"auto",WebkitOverflowScrolling:"touch",borderBottom:`1.5px solid ${T.border}`}},
-    tabs.map(t => React.createElement("button", {key:t.key, onClick:()=>onChange(t.key), style:{
-      padding:"11px 13px",border:"none",background:active===t.key?T.accent:"transparent",
-      color:active===t.key?"#fff":T.textMuted,fontWeight:active===t.key?700:500,
-      fontSize:13,cursor:"pointer",borderRadius:active===t.key?"8px 8px 0 0":0,
-      transition:"all 0.2s",whiteSpace:"nowrap",fontFamily:"'Noto Sans TC',sans-serif",
-    }}, t.icon+" "+t.label))
-  );
+function App(){
+var _tab=h("dashboard"),tab=_tab[0],setTab=_tab[1];
+var _rec=h([]),records=_rec[0],setRecords=_rec[1];
+var _form=h(defRec()),form=_form[0],setForm=_form[1];
+var _ld=h(true),loading=_ld[0],setLoading=_ld[1];
+var _toast=h(""),toast=_toast[0],setToast=_toast[1];
+var _ed=h(null),editDate=_ed[0],setEditDate=_ed[1];
+
+ue(function(){try{var s=localStorage.getItem(SK);if(s){setRecords(JSON.parse(s));}else{var d=genDemo();setRecords(d);localStorage.setItem(SK,JSON.stringify(d));}}catch(x){var d2=genDemo();setRecords(d2);}setLoading(false);},[]);
+
+function persist(data){try{localStorage.setItem(SK,JSON.stringify(data));}catch(x){}}
+function show(msg){setToast(msg);setTimeout(function(){setToast("");},2500);}
+function set(field){return function(val){setForm(function(f){var n={};Object.keys(f).forEach(function(k){n[k]=f[k];});n[field]=val;return n;});};}
+function handleSave(){if(!form.date)return;var idx=-1;for(var i=0;i<records.length;i++){if(records[i].date===form.date){idx=i;break;}}var u;if(idx>=0){u=records.slice();u[idx]=form;}else{u=records.concat([form]);u.sort(function(a,b){return a.date<b.date?-1:1;});}setRecords(u);persist(u);show(idx>=0?"已更新 ✓":"已儲存 ✓");setForm(defRec());setEditDate(null);}
+function handleEdit(date){for(var i=0;i<records.length;i++){if(records[i].date===date){setForm(Object.assign({},records[i]));setEditDate(date);setTab("record");return;}}}
+function handleDelete(date){var u=records.filter(function(r){return r.date!==date;});setRecords(u);persist(u);show("已刪除 ✓");}
+
+var strokeDay=daysSince("2026-03-09");
+var latest=records.length?records[records.length-1]:null;
+var avgPain=records.length?(records.reduce(function(s,r){return s+r.painScore;},0)/records.length).toFixed(1):"0";
+var alerts=[];if(records.length>=3){var recent=records.slice(-7);if(recent.slice(-3).filter(function(r){return r.painScore>=6;}).length>=3)alerts.push("連續3天疼痛≥6分，建議暫停相關動作並回報治療師");if(recent.length>=4){var l4=recent.slice(-4).map(function(r){return r.painScore;});if(l4[3]>l4[2]&&l4[2]>l4[1]&&l4[1]>l4[0])alerts.push("疼痛分數連續上升，可能需要降低訓練強度");}if(recent.slice(-3).filter(function(r){return r.mood==="明顯沮喪"||r.mood==="煩躁易怒";}).length>=3)alerts.push("情緒已連續3天以上低落，建議多傾聽");}
+
+var painTrend=records.map(function(r){return{date:fmt(r.date),"\u75bc\u75db":r.painScore};});
+var mobilityTrend=records.map(function(r){return{date:fmt(r.date),"\u7ffb\u8eab":ML[r.rollOver]||0,"\u5750\u8d77":ML[r.sitUp]||0,"\u7ad9\u7acb":ML[r.standing]||0,"\u884c\u8d70":WL[r.walking]||0};});
+var brunnTrend=records.map(function(r){return{date:fmt(r.date),"\u4e0a\u80a2":BM[r.brunnUpper]||0,"\u624b\u6307":BM[r.brunnFinger]||0,"\u4e0b\u80a2":BM[r.brunnLower]||0};});
+var gripAnkleTrend=records.map(function(r){return{date:fmt(r.date),"\u63e1\u529b":GM[r.gripStrength]||0,"\u8e1d\u80cc\u5c48":AM[r.ankleDorsi]||0};});
+var moodTrend=records.map(function(r){return{date:fmt(r.date),"\u60c5\u7dd2":MM[r.mood]||0,"\u7761\u7720":SM[r.sleep]||0,"\u914d\u5408\u5ea6":CM[r.cooperation]||0};});
+var radarData=latest?[{item:"翻身",score:ML[latest.rollOver]||0},{item:"坐起",score:ML[latest.sitUp]||0},{item:"站立",score:ML[latest.standing]||0},{item:"行走",score:Math.min((WL[latest.walking]||0)*0.75,3)},{item:"情緒",score:(MM[latest.mood]||0)*0.75},{item:"配合度",score:CM[latest.cooperation]||0},{item:"上肢分期",score:(BM[latest.brunnUpper]||0)*0.5},{item:"下肢分期",score:(BM[latest.brunnLower]||0)*0.5}]:[];
+var weeks={};records.forEach(function(r){var k=weekOf(r.date);if(!weeks[k])weeks[k]=[];weeks[k].push(r);});
+var weeklyData=Object.keys(weeks).map(function(k){var rs=weeks[k];return{week:k,label:fmt(k)+" 週",days:rs.length,avgPain:(rs.reduce(function(s,r){return s+r.painScore;},0)/rs.length).toFixed(1),records:rs};}).sort(function(a,b){return b.week<a.week?-1:1;});
+
+if(loading)return e("div",{style:{display:"flex",justifyContent:"center",alignItems:"center",minHeight:"100vh",color:T.textMuted}},"載入中⋯");
+
+var tabs=[{key:"dashboard",label:"總覽",icon:"◉"},{key:"record",label:"紀錄",icon:"✎"},{key:"history",label:"歷史",icon:"☰"},{key:"trends",label:"圖表",icon:"◆"},{key:"weekly",label:"週報",icon:"▤"}];
+function inp(val,onChange,ph,ml){return e(ml?"textarea":"input",{value:val,onChange:function(ev){onChange(ev.target.value);},placeholder:ph,rows:ml?2:undefined,style:{width:"100%",padding:"9px 11px",border:"1px solid "+T.border,borderRadius:8,fontSize:13,fontFamily:"'Noto Sans TC',sans-serif",background:T.inputBg,color:T.text,outline:"none",boxSizing:"border-box",resize:ml?"vertical":"none"}});}
+function sel(val,onChange,opts){return e("select",{value:val,onChange:function(ev){onChange(ev.target.value);},style:{width:"100%",padding:"9px 11px",border:"1px solid "+T.border,borderRadius:8,fontSize:13,fontFamily:"'Noto Sans TC',sans-serif",background:T.inputBg,color:T.text,outline:"none",boxSizing:"border-box"}},opts.map(function(o){return e("option",{key:o,value:o},o);}));}
+function field(label,child){return e("div",{style:{marginBottom:14}},e("label",{style:{display:"block",fontSize:12,fontWeight:600,color:T.textSec,marginBottom:5}},label),child);}
+function card(title,children){return e("div",{style:{background:T.card,borderRadius:14,padding:"18px",boxShadow:T.shadow,marginBottom:18}},e("h3",{style:{margin:"0 0 14px",fontSize:14,color:T.accent,fontFamily:"'Noto Serif TC',serif",fontWeight:600}},title),children);}
+function statCard(label,value,sub,color){return e("div",{style:{background:T.card,borderRadius:12,padding:"14px 16px",boxShadow:T.shadow,flex:"1 1 130px",minWidth:120}},e("div",{style:{fontSize:11,color:T.textMuted,marginBottom:3}},label),e("div",{style:{fontSize:24,fontWeight:800,color:color||T.text,fontFamily:"'DM Mono',monospace"}},value),sub?e("div",{style:{fontSize:11,color:T.textSec,marginTop:2}},sub):null);}
+var alertBox=alerts.length>0?e("div",{style:{background:"#FDF6F0",borderRadius:12,padding:"14px 16px",marginBottom:18,boxShadow:T.shadow}},e("div",{style:{fontWeight:700,fontSize:13,color:T.red,marginBottom:6,fontFamily:"'Noto Serif TC',serif"}},"⚠ 需要留意"),alerts.map(function(a,i){return e("div",{key:i,style:{fontSize:12,color:T.text,marginBottom:4,paddingLeft:10,borderLeft:"2px solid "+T.red}},a);}),e("div",{style:{fontSize:10,color:T.textMuted,marginTop:8}},"以上僅為紀錄模式提醒，請與治療師討論後再調整")):null;
+var tabBar=e("div",{style:{display:"flex",gap:0,overflowX:"auto",WebkitOverflowScrolling:"touch",borderBottom:"1.5px solid "+T.border,margin:"12px 14px 0"}},tabs.map(function(t){return e("button",{key:t.key,onClick:function(){setTab(t.key);},style:{padding:"11px 13px",border:"none",background:tab===t.key?T.accent:"transparent",color:tab===t.key?"#fff":T.textMuted,fontWeight:tab===t.key?700:500,fontSize:13,cursor:"pointer",borderRadius:tab===t.key?"8px 8px 0 0":"0",transition:"all 0.2s",whiteSpace:"nowrap",fontFamily:"'Noto Sans TC',sans-serif"}},t.icon+" "+t.label);}));
+
+var content=null;
+
+if(tab==="dashboard"){content=e("div",null,e("div",{style:{background:T.card,borderRadius:14,padding:"20px",boxShadow:T.shadow,marginBottom:20}},e("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:14}},e("div",null,e("h2",{style:{margin:0,fontSize:18,fontFamily:"'Noto Serif TC',serif"}},"個案展示"),e("div",{style:{fontSize:12,color:T.textSec,marginTop:2}},"50+ 歲 · 男性 · 資料已去識別化")),e("div",{style:{background:T.accent,color:"#fff",padding:"6px 14px",borderRadius:20,fontSize:13,fontWeight:700,fontFamily:"'DM Mono',monospace"}},"Day "+strokeDay)),e("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"8px 16px",fontSize:12,color:T.textSec}},["診斷　出血性腦中風","出血位置　（已遮蔽）","影響側　單側偏癱","治療方式　保守治療","主治醫師　醫療團隊","慣用手　右手","輔具　輪椅、四腳拐","吞嚥/語言/認知　皆正常"].map(function(t,i){var p=t.split("　");return e("div",{key:i},e("strong",{style:{color:T.text}},p[0]),"　"+p[1]);}))),alertBox,e("div",{style:{display:"flex",flexWrap:"wrap",gap:10,marginBottom:18}},statCard("中風後天數",strokeDay,"天",T.accent),statCard("紀錄筆數",records.length,"天"),statCard("平均疼痛",avgPain,"/10",T.yellow)),latest?e("div",{style:{background:T.card,borderRadius:14,padding:"18px",boxShadow:T.shadow}},e("h3",{style:{margin:"0 0 12px",fontSize:14,fontFamily:"'Noto Serif TC',serif",color:T.accent}},"最新紀錄 — "+latest.date),e("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"6px 14px",fontSize:12,color:T.textSec}},["行走："+latest.walking,"站立："+latest.standing,"上肢分期："+latest.brunnUpper,"下肢分期："+latest.brunnLower,"手指分期："+latest.brunnFinger,"握力："+latest.gripStrength,"踝背屈："+latest.ankleDorsi,"疼痛："+latest.painScore+"/10"].map(function(t,i){return e("div",{key:i},t);})),latest.notes?e("div",{style:{marginTop:10,padding:"8px 12px",background:T.inputBg,borderRadius:8,fontSize:12,fontStyle:"italic"}},"💡 "+latest.notes):null):null);}
+
+if(tab==="record"){content=e("div",null,alertBox,editDate?e("div",{style:{background:"#EEF5F1",padding:"8px 12px",borderRadius:10,marginBottom:14,fontSize:12,color:T.accent}},"✎ 編輯 "+editDate,e("span",{onClick:function(){setForm(defRec());setEditDate(null);},style:{float:"right",cursor:"pointer",textDecoration:"underline"}},"取消")):null,field("日期",e("input",{type:"date",value:form.date,onChange:function(ev){set("date")(ev.target.value);},style:{width:"100%",padding:"9px 11px",border:"1px solid "+T.border,borderRadius:8,fontSize:13,fontFamily:"inherit",background:T.inputBg,color:T.text,boxSizing:"border-box"}})),card("復健內容",e("div",null,field("物理治療",inp(form.pt,set("pt"),"今天的物理治療⋯")),field("職能治療",inp(form.ot,set("ot"),"今天的職能治療⋯")),field("自主練習",inp(form.selfPractice,set("selfPractice"),"自己做的練習⋯")),field("其他",inp(form.other,set("other"),"語言治療等⋯")))),card("左側肢體狀況",e("div",null,field("上肢描述",inp(form.upperLimb,set("upperLimb"),"肩/肘/手狀況⋯")),field("下肢描述",inp(form.lowerLimb,set("lowerLimb"),"髖/膝/踝狀況⋯")),field("肌肉張力",sel(form.muscleTone,set("muscleTone"),["正常","偏緊","明顯痙攣"])))),card("肢體評估（進階）",e("div",null,e("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10}},field("布朗斯壯·上肢",sel(form.brunnUpper,set("brunnUpper"),Object.keys(BM))),field("布朗斯壯·手指",sel(form.brunnFinger,set("brunnFinger"),Object.keys(BM))),field("布朗斯壯·下肢",sel(form.brunnLower,set("brunnLower"),Object.keys(BM)))),field("左肩主動關節活動度",inp(form.shoulderRom,set("shoulderRom"),"例：前屈約60度")),e("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}},field("左手握力",sel(form.gripStrength,set("gripStrength"),Object.keys(GM))),field("左踝背屈",sel(form.ankleDorsi,set("ankleDorsi"),Object.keys(AM)))))),card("疼痛",e("div",null,field("疼痛程度 "+form.painScore+"/10",e("input",{type:"range",min:0,max:10,value:form.painScore,onChange:function(ev){set("painScore")(+ev.target.value);},style:{width:"100%",accentColor:form.painScore<=3?T.green:form.painScore<=6?T.yellow:T.red}})),form.painScore>0?field("哪裡痛",inp(form.painLocation,set("painLocation"),"例：左肩前側")):null,form.painScore>0?field("什麼時候痛",inp(form.painTiming,set("painTiming"),"例：做外展時")):null)),card("日常功能",e("div",null,e("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}},field("翻身",sel(form.rollOver,set("rollOver"),Object.keys(ML))),field("坐起",sel(form.sitUp,set("sitUp"),Object.keys(ML))),field("站立",sel(form.standing,set("standing"),Object.keys(ML))),field("行走",sel(form.walking,set("walking"),Object.keys(WL)))),field("進食",sel(form.eating,set("eating"),["需餵食","慣用手自行","左手可輔助"])))),card("情緒與精神",e("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10}},field("情緒",sel(form.mood,set("mood"),Object.keys(MM))),field("睡眠",sel(form.sleep,set("sleep"),Object.keys(SM))),field("配合度",sel(form.cooperation,set("cooperation"),Object.keys(CM))))),field("今天的小發現",inp(form.notes,set("notes"),"值得記下來的觀察⋯",true)),e("button",{onClick:handleSave,style:{width:"100%",padding:"12px",background:T.accent,color:"#fff",border:"none",borderRadius:10,fontSize:15,fontWeight:700,cursor:"pointer"}},editDate?"更新紀錄":"儲存今日紀錄"));}
+
+if(tab==="history"){content=e("div",null,records.slice().reverse().map(function(r){return e("div",{key:r.date,style:{background:T.card,borderRadius:12,padding:"14px 16px",boxShadow:T.shadow,marginBottom:10}},e("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}},e("span",{style:{fontWeight:700,fontSize:15,fontFamily:"'DM Mono',monospace"}},r.date),e("div",{style:{display:"flex",gap:8}},e("span",{onClick:function(){handleEdit(r.date);},style:{cursor:"pointer",fontSize:12,color:T.accent}},"編輯"),e("span",{onClick:function(){handleDelete(r.date);},style:{cursor:"pointer",fontSize:12,color:T.red}},"刪除"))),e("div",{style:{display:"flex",flexWrap:"wrap",gap:6,marginBottom:6}},tag("疼痛 "+r.painScore+"/10",r.painScore<=3?"#EEF5F1":r.painScore<=6?"#FDF6F0":"#FCEEED",r.painScore<=3?T.green:r.painScore<=6?T.yellow:T.red),tag(r.mood,"#EEF5F1",T.accent),tag("上肢"+r.brunnUpper,"#F3F0EC",T.textSec)),e("div",{style:{fontSize:12,color:T.textSec,lineHeight:1.5}},r.pt?e("div",null,"物治："+r.pt.substring(0,45)):null,e("div",{style:{marginTop:2}},"翻身"+r.rollOver+" · "+r.walking)),r.notes?e("div",{style:{marginTop:6,padding:"6px 10px",background:T.inputBg,borderRadius:8,fontSize:11,fontStyle:"italic"}},"💡 "+r.notes):null);}));}
+
+if(tab==="trends"){var cs={strokeDasharray:"3 3",stroke:T.border};content=e("div",null,e("div",{style:{display:"flex",flexWrap:"wrap",gap:10,marginBottom:18}},statCard("中風後天數",strokeDay,"天",T.accent),statCard("紀錄天數",records.length,"天"),statCard("平均疼痛",avgPain,"/10",T.yellow),statCard("最新行走",latest?latest.walking:"-")),card("疼痛趨勢",e(RC,{width:"100%",height:200},e(LC,{data:painTrend},e(CG,cs),e(XA,{dataKey:"date",fontSize:10,tick:{fill:T.textMuted}}),e(YA,{domain:[0,10],fontSize:10,tick:{fill:T.textMuted}}),e(TT,{contentStyle:{borderRadius:8,fontSize:12}}),e(L,{type:"monotone",dataKey:"\u75bc\u75db",stroke:T.red,strokeWidth:2,dot:{r:3,fill:T.red}})))),card("日常功能進展",e(RC,{width:"100%",height:220},e(LC,{data:mobilityTrend},e(CG,cs),e(XA,{dataKey:"date",fontSize:10,tick:{fill:T.textMuted}}),e(YA,{domain:[0,4],fontSize:10,tick:{fill:T.textMuted},tickFormatter:function(v){return["","全助","部助","自行","獨立"][v]||"";}}),e(TT,{contentStyle:{borderRadius:8,fontSize:12}}),e(LG,{wrapperStyle:{fontSize:11}}),e(L,{type:"stepAfter",dataKey:"\u7ffb\u8eab",stroke:"#4A6B5D",strokeWidth:2,dot:{r:2.5}}),e(L,{type:"stepAfter",dataKey:"\u5750\u8d77",stroke:"#6B8F5E",strokeWidth:2,dot:{r:2.5}}),e(L,{type:"stepAfter",dataKey:"\u7ad9\u7acb",stroke:"#8BA888",strokeWidth:2,dot:{r:2.5}}),e(L,{type:"stepAfter",dataKey:"\u884c\u8d70",stroke:T.red,strokeWidth:2,dot:{r:2.5}})))),card("布朗斯壯分期進展",e(RC,{width:"100%",height:220},e(LC,{data:brunnTrend},e(CG,cs),e(XA,{dataKey:"date",fontSize:10,tick:{fill:T.textMuted}}),e(YA,{domain:[0,6],fontSize:10,tick:{fill:T.textMuted},tickFormatter:function(v){return v>0?"\u7b2c"+v+"\u671f":"";}}),e(TT,{contentStyle:{borderRadius:8,fontSize:12}}),e(LG,{wrapperStyle:{fontSize:11}}),e(L,{type:"stepAfter",dataKey:"\u4e0a\u80a2",stroke:"#4A6B5D",strokeWidth:2.5,dot:{r:3}}),e(L,{type:"stepAfter",dataKey:"\u624b\u6307",stroke:"#8BA888",strokeWidth:2.5,dot:{r:3}}),e(L,{type:"stepAfter",dataKey:"\u4e0b\u80a2",stroke:T.yellow,strokeWidth:2.5,dot:{r:3}})))),card("握力與踝背屈進展",e(RC,{width:"100%",height:200},e(LC,{data:gripAnkleTrend},e(CG,cs),e(XA,{dataKey:"date",fontSize:10,tick:{fill:T.textMuted}}),e(YA,{domain:[0,3],fontSize:10,tick:{fill:T.textMuted},tickFormatter:function(v){return["\u7121","\u5fae\u52d5","\u53ef\u52d5","\u6b63\u5e38"][v]||"";}}),e(TT,{contentStyle:{borderRadius:8,fontSize:12}}),e(LG,{wrapperStyle:{fontSize:11}}),e(L,{type:"stepAfter",dataKey:"\u63e1\u529b",stroke:"#4A6B5D",strokeWidth:2.5,dot:{r:3}}),e(L,{type:"stepAfter",dataKey:"\u8e1d\u80cc\u5c48",stroke:T.red,strokeWidth:2.5,dot:{r:3}})))),card("情緒·睡眠·配合度",e(RC,{width:"100%",height:200},e(BC,{data:moodTrend},e(CG,cs),e(XA,{dataKey:"date",fontSize:10,tick:{fill:T.textMuted}}),e(YA,{domain:[0,4],fontSize:10,tick:{fill:T.textMuted}}),e(TT,{contentStyle:{borderRadius:8,fontSize:12}}),e(LG,{wrapperStyle:{fontSize:11}}),e(BA,{dataKey:"\u60c5\u7dd2",fill:"#4A6B5D",radius:[3,3,0,0]}),e(BA,{dataKey:"\u7761\u7720",fill:"#8BA888",radius:[3,3,0,0]}),e(BA,{dataKey:"\u914d\u5408\u5ea6",fill:T.yellow,radius:[3,3,0,0]})))),latest?card("最新狀態總覽",e(RC,{width:"100%",height:280},e(RDC,{data:radarData},e(PG,{stroke:T.border}),e(PAA,{dataKey:"item",fontSize:11,tick:{fill:T.textSec}}),e(PRA,{domain:[0,3.5],tick:false,axisLine:false}),e(RD,{dataKey:"score",stroke:T.accent,fill:T.accent,fillOpacity:0.2,strokeWidth:2})))):null);}
+
+if(tab==="weekly"){content=e("div",null,weeklyData.map(function(w){var ap=+w.avgPain;var lr=w.records[w.records.length-1];var fr=w.records[0];var ch=[];if((ML[lr.rollOver]||0)>(ML[fr.rollOver]||0))ch.push("翻身↑");if((ML[lr.sitUp]||0)>(ML[fr.sitUp]||0))ch.push("坐起↑");if((ML[lr.standing]||0)>(ML[fr.standing]||0))ch.push("站立↑");if((WL[lr.walking]||0)>(WL[fr.walking]||0))ch.push("行走↑");if((BM[lr.brunnUpper]||0)>(BM[fr.brunnUpper]||0))ch.push("上肢分期↑");if((BM[lr.brunnFinger]||0)>(BM[fr.brunnFinger]||0))ch.push("手指分期↑");if((BM[lr.brunnLower]||0)>(BM[fr.brunnLower]||0))ch.push("下肢分期↑");if((GM[lr.gripStrength]||0)>(GM[fr.gripStrength]||0))ch.push("握力↑");if((AM[lr.ankleDorsi]||0)>(AM[fr.ankleDorsi]||0))ch.push("踝背屈↑");return e("div",{key:w.week,style:{background:T.card,borderRadius:14,padding:"16px",boxShadow:T.shadow,marginBottom:14}},e("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}},e("h3",{style:{margin:0,fontSize:15,fontWeight:700,fontFamily:"'Noto Serif TC',serif"}},w.label),e("span",{style:{fontSize:11,color:T.textMuted}},w.days+"天紀錄")),e("div",{style:{display:"flex",flexWrap:"wrap",gap:6,marginBottom:10}},tag("平均疼痛 "+w.avgPain,ap<=3?"#EEF5F1":ap<=6?"#FDF6F0":"#FCEEED",ap<=3?T.green:ap<=6?T.yellow:T.red),tag("上肢"+lr.brunnUpper+" · 下肢"+lr.brunnLower,"#EEF5F1",T.accent)),ch.length>0?e("div",{style:{fontSize:12,marginBottom:6,color:T.green,fontWeight:600}},"▲ "+ch.join("、")):null,e("div",{style:{fontSize:11,color:T.textMuted}},"週末："+lr.walking+" · 站立"+lr.standing+" · 握力"+lr.gripStrength),e("div",{style:{marginTop:8}},e(RC,{width:"100%",height:50},e(LC,{data:w.records.map(function(r){return{d:fmt(r.date),p:r.painScore};})},e(L,{type:"monotone",dataKey:"p",stroke:T.red,strokeWidth:1.5,dot:{r:2,fill:T.red}}),e(XA,{dataKey:"d",hide:true}),e(YA,{domain:[0,10],hide:true})))));}));}
+
+return e("div",{style:{background:T.bg,minHeight:"100vh",maxWidth:680,margin:"0 auto",padding:"0 0 40px"}},e("div",{style:{background:T.accent,color:"#fff",padding:"24px 20px 18px",borderRadius:"0 0 16px 16px"}},e("div",{style:{fontSize:10,opacity:0.6,letterSpacing:3,fontFamily:"'DM Mono',monospace"}},"REHAB TRACKER"),e("h1",{style:{margin:"4px 0 0",fontSize:20,fontWeight:700,fontFamily:"'Noto Serif TC',serif"}},"復健紀錄系統"),e("div",{style:{fontSize:12,opacity:0.75,marginTop:4}},"出血性腦中風 · 單側偏癱 · Day "+strokeDay)),tabBar,e("div",{style:{padding:"14px"}},content),toast?e("div",{style:{position:"fixed",bottom:24,left:"50%",transform:"translateX(-50%)",background:T.accent,color:"#fff",padding:"10px 22px",borderRadius:24,fontSize:13,fontWeight:600,boxShadow:"0 4px 16px rgba(0,0,0,0.12)",animation:"fadeUp 0.3s"}},toast):null);
 }
-
-function Field({label,children,hint}) {
-  return React.createElement("div", {style:{marginBottom:14}},
-    React.createElement("label", {style:{display:"block",fontSize:12,fontWeight:600,color:T.textSec,marginBottom:5}}, label),
-    children,
-    hint && React.createElement("div", {style:{fontSize:11,color:T.textMuted,marginTop:3}}, hint)
-  );
-}
-
-function StatCard({label,value,sub,color}) {
-  return React.createElement("div", {style:{background:T.card,borderRadius:12,padding:"14px 16px",boxShadow:T.shadow,flex:"1 1 130px",minWidth:120}},
-    React.createElement("div", {style:{fontSize:11,color:T.textMuted,marginBottom:3}}, label),
-    React.createElement("div", {style:{fontSize:24,fontWeight:800,color:color||T.text,fontFamily:"'DM Mono',monospace"}}, value),
-    sub && React.createElement("div", {style:{fontSize:11,color:T.textSec,marginTop:2}}, sub)
-  );
-}
-
-function App() {
-  const [tab, setTab] = useState("dashboard");
-  const [records, setRecords] = useState([]);
-  const [form, setForm] = useState(defRec());
-  const [loading, setLoading] = useState(true);
-  const [toast, setToast] = useState("");
-  const [editDate, setEditDate] = useState(null);
-
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(SK);
-      if (stored) { setRecords(JSON.parse(stored)); }
-      else { const demo = genDemo(); setRecords(demo); localStorage.setItem(SK, JSON.stringify(demo)); }
-    } catch { const demo = genDemo(); setRecords(demo); }
-    setLoading(false);
-  }, []);
-
-  const persist = data => { try{localStorage.setItem(SK,JSON.stringify(data))}catch{} };
-  const show = msg => { setToast(msg); setTimeout(()=>setToast(""),2500); };
-  const set = field => val => setForm(f => ({...f,[field]:val}));
-
-  const handleSave = () => {
-    if(!form.date) return;
-    const idx = records.findIndex(r=>r.date===form.date);
-    let u;
-    if(idx>=0){u=[...records];u[idx]={...form};} else {u=[...records,{...form}].sort((a,b)=>a.date.localeCompare(b.date));}
-    setRecords(u); persist(u); show(idx>=0?"已更新 ✓":"已儲存 ✓"); setForm(defRec()); setEditDate(null);
-  };
-
-  const handleEdit = date => { const r=records.find(r=>r.date===date); if(r){setForm({...r});setEditDate(date);setTab("record");} };
-  const handleDelete = date => { const u=records.filter(r=>r.date!==date); setRecords(u); persist(u); show("已刪除 ✓"); };
-
-  const alerts = (() => {
-    const a=[]; const recent=records.slice(-7); if(recent.length<3) return a;
-    if(recent.slice(-3).filter(r=>r.painScore>=6).length>=3) a.push("連續 3 天疼痛 ≥ 6 分，建議暫停相關動作並回報治療師");
-    if(recent.length>=4){const l=recent.slice(-4).map(r=>r.painScore);if(l[3]>l[2]&&l[2]>l[1]&&l[1]>l[0])a.push("疼痛分數連續上升，可能需要降低訓練強度");}
-    if(recent.slice(-3).filter(r=>r.mood==="明顯沮喪"||r.mood==="煩躁易怒").length>=3) a.push("情緒已連續 3 天以上低落，建議多傾聽");
-    return a;
-  })();
-
-  const strokeDay = daysSince("2026-03-09");
-  const latest = records.length ? records[records.length-1] : null;
-
-  const painTrend = records.map(r=>({date:fmt(r.date),疼痛:r.painScore}));
-  const mobilityTrend = records.map(r=>({date:fmt(r.date),翻身:ML[r.rollOver]||0,坐起:ML[r.sitUp]||0,站立:ML[r.standing]||0,行走:WL[r.walking]||0}));
-  const brunnTrend = records.map(r=>({date:fmt(r.date),上肢:BM[r.brunnUpper]||0,手指:BM[r.brunnFinger]||0,下肢:BM[r.brunnLower]||0}));
-  const gripAnkleTrend = records.map(r=>({date:fmt(r.date),握力:GM[r.gripStrength]||0,踝背屈:AM[r.ankleDorsi]||0}));
-  const moodTrend = records.map(r=>({date:fmt(r.date),情緒:MM[r.mood]||0,睡眠:SM[r.sleep]||0,配合度:CM[r.cooperation]||0}));
-  const radarData = latest ? [
-    {item:"翻身",score:ML[latest.rollOver]||0},{item:"坐起",score:ML[latest.sitUp]||0},
-    {item:"站立",score:ML[latest.standing]||0},{item:"行走",score:Math.min((WL[latest.walking]||0)*0.75,3)},
-    {item:"情緒",score:(MM[latest.mood]||0)*0.75},{item:"配合度",score:CM[latest.cooperation]||0},
-    {item:"上肢分期",score:(BM[latest.brunnUpper]||0)*0.5},{item:"下肢分期",score:(BM[latest.brunnLower]||0)*0.5},
-  ] : [];
-
-  const weeklyData = (() => {
-    const w={}; records.forEach(r=>{const k=weekOf(r.date);if(!w[k])w[k]=[];w[k].push(r);});
-    return Object.entries(w).map(([k,rs])=>({week:k,label:fmt(k)+" 週",days:rs.length,avgPain:(rs.reduce((s,r)=>s+r.painScore,0)/rs.length).toFixed(1),records:rs})).sort((a,b)=>b.week.localeCompare(a.week));
-  })();
-
-  if(loading) return React.createElement("div",{style:{display:"flex",justifyContent:"center",alignItems:"center",minHeight:"100vh",color:T.textMuted}},"載入中⋯");
-
-  const tabs = [{key:"dashboard",label:"總覽",icon:"◉"},{key:"record",label:"紀錄",icon:"✎"},{key:"history",label:"歷史",icon:"☰"},{key:"trends",label:"圖表",icon:"◆"},{key:"weekly",label:"週報",icon:"▤"}];
-
-  const inp = (val,onChange,ph,ml) => React.createElement(ml?"textarea":"input", {value:val,onChange:e=>onChange(e.target.value),placeholder:ph,rows:ml?2:undefined,style:{width:"100%",padding:"9px 11px",border:`1px solid ${T.border}`,borderRadius:8,fontSize:13,fontFamily:"'Noto Sans TC',sans-serif",background:T.inputBg,color:T.text,outline:"none",boxSizing:"border-box",resize:ml?"vertical":"none"}});
-  const sel = (val,onChange,opts) => React.createElement("select",{value:val,onChange:e=>onChange(e.target.value),style:{width:"100%",padding:"9px 11px",border:`1px solid ${T.border}`,borderRadius:8,fontSize:13,fontFamily:"'Noto Sans TC',sans-serif",background:T.inputBg,color:T.text,outline:"none",boxSizing:"border-box"}}, opts.map(o=>React.createElement("option",{key:o,value:o},o)));
-
-  const card = (title,children) => React.createElement("div",{style:{background:T.card,borderRadius:14,padding:"18px",boxShadow:T.shadow,marginBottom:18}},
-    React.createElement("h3",{style:{margin:"0 0 14px",fontSize:14,color:T.accent,fontFamily:"'Noto Serif TC',serif",fontWeight:600}},title), children);
-
-  const alertBox = alerts.length > 0 ? React.createElement("div",{style:{background:"#FDF6F0",borderRadius:12,padding:"14px 16px",marginBottom:18,boxShadow:T.shadow}},
-    React.createElement("div",{style:{fontWeight:700,fontSize:13,color:T.red,marginBottom:6,fontFamily:"'Noto Serif TC',serif"}},"⚠ 需要留意"),
-    ...alerts.map((a,i)=>React.createElement("div",{key:i,style:{fontSize:12,color:T.text,marginBottom:4,paddingLeft:10,borderLeft:`2px solid ${T.red}`}},a)),
-    React.createElement("div",{style:{fontSize:10,color:T.textMuted,marginTop:8}},"以上僅為紀錄模式提醒，請與治療師討論後再調整")
-  ) : null;
-
-  const tag = (text,bg,color) => React.createElement("span",{style:{padding:"2px 8px",borderRadius:14,fontSize:11,fontWeight:600,background:bg,color}},text);
-
-  // === RENDER ===
-    return React.createElement("div", {style:{background:T.bg,minHeight:"100vh",maxWidth:680,margin:"0 auto",padding:"0 0 40px"}},
-        // Header
-        React.createElement("div",{style:{background:T.accent,color:"#fff",padding:"24px 20px 18px",borderRadius:"0 0 16px 16px"}},
-            React.createElement("div",{style:{fontSize:10,opacity:0.6,letterSpacing:3,fontFamily:"'DM Mono',monospace"}},"REHAB TRACKER"),
-            React.createElement("h1",{style:{margin:"4px 0 0",fontSize:20,fontWeight:700,fontFamily:"'Noto Serif TC',serif"}},"復健紀錄系統"),
-            React.createElement("div",{style:{fontSize:12,opacity:0.75,marginTop:4}},`匿名個案管理 · 第 ${strokeDay} 天`)
-        ),
-
-        // DASHBOARD
-        tab==="dashboard" && React.createElement("div",{},
-            React.createElement("div",{style:{background:T.card,borderRadius:14,padding:"20px",boxShadow:T.shadow,marginBottom:20}},
-                React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:14}},
-                    React.createElement("div",{},
-                        React.createElement("h2",{style:{margin:0,fontSize:18,fontFamily:"'Noto Serif TC',serif"}},"個案概況"),
-                        React.createElement("div",{style:{fontSize:12,color:T.textSec,marginTop:2}},"個案 A · 資料已去識別化")
-                    )
-                ),
-                React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"8px 16px",fontSize:12,color:T.textSec}},
-                    ...["診斷 隱匿","位置 隱匿","影響側 隱匿","主治 醫療小組","慣用手 確認中","輔具 視階段調整"].map((t,i)=>
-                        React.createElement("div",{key:i},
-                            React.createElement("strong",{style:{color:T.text}},t.split(" ")[0]),` ${t.split(" ")[1]}`
-                        )
-                    )
-                )
-            )
-        )
-    );
+ReactDOM.createRoot(document.getElementById("root")).render(e(App));
+})();
+</script>
+</body>
+</html>
