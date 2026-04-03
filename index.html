@@ -6,14 +6,11 @@
 <title>復健紀錄系統 — Rehab Tracker</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&family=Noto+Serif+TC:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <!-- 1. React & ReactDOM -->
-<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-<!-- 2. Recharts dependency -->
-<script src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js"></script>
-<!-- 3. Recharts -->
-<script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
-<!-- 4. Babel for JSX -->
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js"></script>
+    <script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#FAF8F5;font-family:'Noto Sans TC',sans-serif;color:#1A1A1A;-webkit-font-smoothing:antialiased}
@@ -221,7 +218,7 @@ function App() {
             React.createElement("div",{style:{background:T.accent,color:"#fff",padding:"6px 14px",borderRadius:20,fontSize:13,fontWeight:700,fontFamily:"'DM Mono',monospace"}},`Day ${strokeDay}`)
           ),
           React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"8px 16px",fontSize:12,color:T.textSec}},
-            ...["診斷　急性腦出血中風","出血位置　右側前額葉","影響側　左側偏癱","治療方式　保守治療","主治醫師　醫師","慣用手　未確認","輔具　尚未確認","吞嚥/語言/認知　尚未確認"].map((t,i)=>React.createElement("div",{key:i},React.createElement("strong",{style:{color:T.text}},t.split("　")[0]),`　${t.split("　")[1]}`))
+            ...["診斷 個案匿名處理","出血位置 隱藏","影響側 匿名處理","治療方式 醫療團隊評估中","主治醫師 醫療小組","慣用手 確認中","輔具 視階段調整","功能評估 定期追蹤"].map((t,i)=>React.createElement("div",{key:i},React.createElement("strong",{style:{color:T.text}},t.split("　")[0]),`　${t.split("　")[1]}`))
           )
         ),
         alertBox,
