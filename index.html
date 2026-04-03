@@ -197,173 +197,30 @@ function App() {
   const tag = (text,bg,color) => React.createElement("span",{style:{padding:"2px 8px",borderRadius:14,fontSize:11,fontWeight:600,background:bg,color}},text);
 
   // === RENDER ===
-  return React.createElement("div", {style:{background:T.bg,minHeight:"100vh",maxWidth:680,margin:"0 auto",padding:"0 0 40px"}},
-    // Header
-    React.createElement("div",{style:{background:T.accent,color:"#fff",padding:"24px 20px 18px",borderRadius:"0 0 16px 16px"}},
-      React.createElement("div",{style:{fontSize:10,opacity:0.6,letterSpacing:3,fontFamily:"'DM Mono',monospace"}},"REHAB TRACKER"),
-      React.createElement("h1",{style:{margin:"4px 0 0",fontSize:20,fontWeight:700,fontFamily:"'Noto Serif TC',serif"}},"復健紀錄系統"),
-      React.createElement("div",{style:{fontSize:12,opacity:0.75,marginTop:4}},`急性腦出血中風 · 左側偏癱 · Day ${strokeDay}`)
-    ),
-    React.createElement("div",{style:{padding:"12px 14px 0"}}, React.createElement(Tabs,{tabs,active:tab,onChange:setTab})),
-    React.createElement("div",{style:{padding:"14px"}},
-
-      // DASHBOARD
-      tab==="dashboard" && React.createElement("div",{},
-        React.createElement("div",{style:{background:T.card,borderRadius:14,padding:"20px",boxShadow:T.shadow,marginBottom:20}},
-          React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:14}},
-            React.createElement("div",{},
-              React.createElement("h2",{style:{margin:0,fontSize:18,fontFamily:"'Noto Serif TC',serif"}},"個案 A"),
-              React.createElement("div",{style:{fontSize:12,color:T.textSec,marginTop:2}},"個案 A · 男 · {H}cm / {W}kg · BMI 穩定"
-            ),
-            React.createElement("div",{style:{background:T.accent,color:"#fff",padding:"6px 14px",borderRadius:20,fontSize:13,fontWeight:700,fontFamily:"'DM Mono',monospace"}},`Day ${strokeDay}`)
-          ),
-          React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"8px 16px",fontSize:12,color:T.textSec}},
-            ...["診斷 個案匿名處理","出血位置 隱藏","影響側 匿名處理","治療方式 醫療團隊評估中","主治醫師 醫療小組","慣用手 確認中","輔具 視階段調整","功能評估 定期追蹤"].map((t,i)=>React.createElement("div",{key:i},React.createElement("strong",{style:{color:T.text}},t.split("　")[0]),`　${t.split("　")[1]}`))
-          )
+    return React.createElement("div", {style:{background:T.bg,minHeight:"100vh",maxWidth:680,margin:"0 auto",padding:"0 0 40px"}},
+        // Header
+        React.createElement("div",{style:{background:T.accent,color:"#fff",padding:"24px 20px 18px",borderRadius:"0 0 16px 16px"}},
+            React.createElement("div",{style:{fontSize:10,opacity:0.6,letterSpacing:3,fontFamily:"'DM Mono',monospace"}},"REHAB TRACKER"),
+            React.createElement("h1",{style:{margin:"4px 0 0",fontSize:20,fontWeight:700,fontFamily:"'Noto Serif TC',serif"}},"復健紀錄系統"),
+            React.createElement("div",{style:{fontSize:12,opacity:0.75,marginTop:4}},`匿名個案管理 · 第 ${strokeDay} 天`)
         ),
-        alertBox,
-        React.createElement("div",{style:{display:"flex",flexWrap:"wrap",gap:10,marginBottom:18}},
-          React.createElement(StatCard,{label:"中風後天數",value:strokeDay,sub:"天",color:T.accent}),
-          React.createElement(StatCard,{label:"紀錄筆數",value:records.length,sub:"天"}),
-          React.createElement(StatCard,{label:"平均疼痛",value:(records.reduce((s,r)=>s+r.painScore,0)/records.length).toFixed(1),sub:"/10",color:T.yellow})
-        ),
-        latest && React.createElement("div",{style:{background:T.card,borderRadius:14,padding:"18px",boxShadow:T.shadow}},
-          React.createElement("h3",{style:{margin:"0 0 12px",fontSize:14,fontFamily:"'Noto Serif TC',serif",color:T.accent}},`最新紀錄 — ${latest.date}`),
-          React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"6px 14px",fontSize:12,color:T.textSec}},
-            ...["行走："+latest.walking,"站立："+latest.standing,"上肢分期："+latest.brunnUpper,"下肢分期："+latest.brunnLower,"手指分期："+latest.brunnFinger,"握力："+latest.gripStrength,"踝背屈："+latest.ankleDorsi,"疼痛："+latest.painScore+"/10"].map((t,i)=>React.createElement("div",{key:i},t))
-          ),
-          latest.notes && React.createElement("div",{style:{marginTop:10,padding:"8px 12px",background:T.inputBg,borderRadius:8,fontSize:12,fontStyle:"italic"}},"💡 "+latest.notes)
-        )
-      ),
 
-      // RECORD
-      tab==="record" && React.createElement("div",{},
-        alertBox,
-        editDate && React.createElement("div",{style:{background:"#EEF5F1",padding:"8px 12px",borderRadius:10,marginBottom:14,fontSize:12,color:T.accent}},
-          "✎ 編輯 "+editDate,
-          React.createElement("span",{onClick:()=>{setForm(defRec());setEditDate(null);},style:{float:"right",cursor:"pointer",textDecoration:"underline"}},"取消")
-        ),
-        React.createElement(Field,{label:"日期"},React.createElement("input",{type:"date",value:form.date,onChange:e=>set("date")(e.target.value),style:{width:"100%",padding:"9px 11px",border:`1px solid ${T.border}`,borderRadius:8,fontSize:13,fontFamily:"inherit",background:T.inputBg,color:T.text,boxSizing:"border-box"}})),
-        card("復健內容",React.createElement("div",{},
-          React.createElement(Field,{label:"物理治療"},inp(form.pt,set("pt"),"今天的物理治療⋯")),
-          React.createElement(Field,{label:"職能治療"},inp(form.ot,set("ot"),"今天的職能治療⋯")),
-          React.createElement(Field,{label:"自主練習"},inp(form.selfPractice,set("selfPractice"),"自己做的練習⋯")),
-          React.createElement(Field,{label:"其他"},inp(form.other,set("other"),"語言治療等⋯"))
-        )),
-        card("左側肢體狀況",React.createElement("div",{},
-          React.createElement(Field,{label:"上肢描述"},inp(form.upperLimb,set("upperLimb"),"肩/肘/手狀況⋯")),
-          React.createElement(Field,{label:"下肢描述"},inp(form.lowerLimb,set("lowerLimb"),"髖/膝/踝狀況⋯")),
-          React.createElement(Field,{label:"肌肉張力"},sel(form.muscleTone,set("muscleTone"),["正常","偏緊","明顯痙攣"]))
-        )),
-        card("肢體評估（進階）",React.createElement("div",{},
-          React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10}},
-            React.createElement(Field,{label:"布朗斯壯·上肢"},sel(form.brunnUpper,set("brunnUpper"),Object.keys(BM))),
-            React.createElement(Field,{label:"布朗斯壯·手指"},sel(form.brunnFinger,set("brunnFinger"),Object.keys(BM))),
-            React.createElement(Field,{label:"布朗斯壯·下肢"},sel(form.brunnLower,set("brunnLower"),Object.keys(BM)))
-          ),
-          React.createElement(Field,{label:"左肩主動關節活動度"},inp(form.shoulderRom,set("shoulderRom"),"例：前屈約60度")),
-          React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}},
-            React.createElement(Field,{label:"左手握力"},sel(form.gripStrength,set("gripStrength"),Object.keys(GM))),
-            React.createElement(Field,{label:"左踝背屈"},sel(form.ankleDorsi,set("ankleDorsi"),Object.keys(AM)))
-          )
-        )),
-        card("疼痛",React.createElement("div",{},
-          React.createElement(Field,{label:"疼痛程度 "+form.painScore+"/10"},
-            React.createElement("input",{type:"range",min:0,max:10,value:form.painScore,onChange:e=>set("painScore")(+e.target.value),style:{width:"100%",accentColor:form.painScore<=3?T.green:form.painScore<=6?T.yellow:T.red}})
-          ),
-          form.painScore>0 && React.createElement(Field,{label:"哪裡痛"},inp(form.painLocation,set("painLocation"),"例：左肩前側")),
-          form.painScore>0 && React.createElement(Field,{label:"什麼時候痛"},inp(form.painTiming,set("painTiming"),"例：做外展時"))
-        )),
-        card("日常功能",React.createElement("div",{},
-          React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}},
-            React.createElement(Field,{label:"翻身"},sel(form.rollOver,set("rollOver"),Object.keys(ML))),
-            React.createElement(Field,{label:"坐起"},sel(form.sitUp,set("sitUp"),Object.keys(ML))),
-            React.createElement(Field,{label:"站立"},sel(form.standing,set("standing"),Object.keys(ML))),
-            React.createElement(Field,{label:"行走"},sel(form.walking,set("walking"),Object.keys(WL)))
-          ),
-          React.createElement(Field,{label:"進食"},sel(form.eating,set("eating"),["需餵食","慣用手自行","左手可輔助"]))
-        )),
-        card("情緒與精神",React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10}},
-          React.createElement(Field,{label:"情緒"},sel(form.mood,set("mood"),Object.keys(MM))),
-          React.createElement(Field,{label:"睡眠"},sel(form.sleep,set("sleep"),Object.keys(SM))),
-          React.createElement(Field,{label:"配合度"},sel(form.cooperation,set("cooperation"),Object.keys(CM)))
-        )),
-        React.createElement(Field,{label:"今天的小發現"},inp(form.notes,set("notes"),"值得記下來的觀察⋯",true)),
-        React.createElement("button",{onClick:handleSave,style:{width:"100%",padding:"12px",background:T.accent,color:"#fff",border:"none",borderRadius:10,fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"'Noto Sans TC',sans-serif"}}, editDate?"更新紀錄":"儲存今日紀錄")
-      ),
-
-      // HISTORY
-      tab==="history" && React.createElement("div",{},
-        [...records].reverse().map(r => React.createElement("div",{key:r.date,style:{background:T.card,borderRadius:12,padding:"14px 16px",boxShadow:T.shadow,marginBottom:10}},
-          React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}},
-            React.createElement("span",{style:{fontWeight:700,fontSize:15,fontFamily:"'DM Mono',monospace"}},r.date),
-            React.createElement("div",{style:{display:"flex",gap:8}},
-              React.createElement("span",{onClick:()=>handleEdit(r.date),style:{cursor:"pointer",fontSize:12,color:T.accent}},"編輯"),
-              React.createElement("span",{onClick:()=>handleDelete(r.date),style:{cursor:"pointer",fontSize:12,color:T.red}},"刪除")
+        // DASHBOARD
+        tab==="dashboard" && React.createElement("div",{},
+            React.createElement("div",{style:{background:T.card,borderRadius:14,padding:"20px",boxShadow:T.shadow,marginBottom:20}},
+                React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:14}},
+                    React.createElement("div",{},
+                        React.createElement("h2",{style:{margin:0,fontSize:18,fontFamily:"'Noto Serif TC',serif"}},"個案概況"),
+                        React.createElement("div",{style:{fontSize:12,color:T.textSec,marginTop:2}},"個案 A · 資料已去識別化")
+                    )
+                ),
+                React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"8px 16px",fontSize:12,color:T.textSec}},
+                    ...["診斷 隱匿","位置 隱匿","影響側 隱匿","主治 醫療小組","慣用手 確認中","輔具 視階段調整"].map((t,i)=>
+                        React.createElement("div",{key:i},
+                            React.createElement("strong",{style:{color:T.text}},t.split(" ")[0]),` ${t.split(" ")[1]}`
+                        )
+                    )
+                )
             )
-          ),
-          React.createElement("div",{style:{display:"flex",flexWrap:"wrap",gap:6,marginBottom:6}},
-            tag(`疼痛 ${r.painScore}/10`, r.painScore<=3?"#EEF5F1":r.painScore<=6?"#FDF6F0":"#FCEEED", r.painScore<=3?T.green:r.painScore<=6?T.yellow:T.red),
-            tag(r.mood,"#EEF5F1",T.accent),
-            tag(`上肢${r.brunnUpper}`,"#F3F0EC",T.textSec),
-            tag(`下肢${r.brunnLower}`,"#F3F0EC",T.textSec)
-          ),
-          React.createElement("div",{style:{fontSize:12,color:T.textSec,lineHeight:1.5}},
-            r.pt && React.createElement("div",{},`物治：${r.pt.substring(0,45)}${r.pt.length>45?"⋯":""}`),
-            React.createElement("div",{style:{marginTop:2}},`翻身${r.rollOver} · 站立${r.standing} · ${r.walking}`)
-          ),
-          r.notes && React.createElement("div",{style:{marginTop:6,padding:"6px 10px",background:T.inputBg,borderRadius:8,fontSize:11,fontStyle:"italic"}},"💡 "+r.notes)
-        ))
-      ),
-
-      // TRENDS
-      tab==="trends" && React.createElement("div",{},
-        React.createElement("div",{style:{display:"flex",flexWrap:"wrap",gap:10,marginBottom:18}},
-          React.createElement(StatCard,{label:"中風後天數",value:strokeDay,color:T.accent,sub:"天"}),
-          React.createElement(StatCard,{label:"紀錄天數",value:records.length,sub:"天"}),
-          React.createElement(StatCard,{label:"平均疼痛",value:(records.reduce((s,r)=>s+r.painScore,0)/records.length).toFixed(1),sub:"/10",color:T.yellow}),
-          React.createElement(StatCard,{label:"最新行走",value:latest?.walking||"-"})
-        ),
-        card("疼痛趨勢", React.createElement(ResponsiveContainer,{width:"100%",height:200},React.createElement(LineChart,{data:painTrend},React.createElement(CartesianGrid,{strokeDasharray:"3 3",stroke:T.border}),React.createElement(XAxis,{dataKey:"date",fontSize:10,tick:{fill:T.textMuted}}),React.createElement(YAxis,{domain:[0,10],fontSize:10,tick:{fill:T.textMuted}}),React.createElement(Tooltip,{contentStyle:{borderRadius:8,fontSize:12}}),React.createElement(Line,{type:"monotone",dataKey:"疼痛",stroke:T.red,strokeWidth:2,dot:{r:3,fill:T.red}})))),
-        card("日常功能進展", React.createElement(ResponsiveContainer,{width:"100%",height:220},React.createElement(LineChart,{data:mobilityTrend},React.createElement(CartesianGrid,{strokeDasharray:"3 3",stroke:T.border}),React.createElement(XAxis,{dataKey:"date",fontSize:10,tick:{fill:T.textMuted}}),React.createElement(YAxis,{domain:[0,4],fontSize:10,tick:{fill:T.textMuted},tickFormatter:v=>["","全助","部助","自行","獨立"][v]||""}),React.createElement(Tooltip,{contentStyle:{borderRadius:8,fontSize:12}}),React.createElement(Legend,{wrapperStyle:{fontSize:11}}),React.createElement(Line,{type:"stepAfter",dataKey:"翻身",stroke:"#4A6B5D",strokeWidth:2,dot:{r:2.5}}),React.createElement(Line,{type:"stepAfter",dataKey:"坐起",stroke:"#6B8F5E",strokeWidth:2,dot:{r:2.5}}),React.createElement(Line,{type:"stepAfter",dataKey:"站立",stroke:"#8BA888",strokeWidth:2,dot:{r:2.5}}),React.createElement(Line,{type:"stepAfter",dataKey:"行走",stroke:T.red,strokeWidth:2,dot:{r:2.5}})))),
-        card("布朗斯壯分期進展", React.createElement(ResponsiveContainer,{width:"100%",height:220},React.createElement(LineChart,{data:brunnTrend},React.createElement(CartesianGrid,{strokeDasharray:"3 3",stroke:T.border}),React.createElement(XAxis,{dataKey:"date",fontSize:10,tick:{fill:T.textMuted}}),React.createElement(YAxis,{domain:[0,6],fontSize:10,tick:{fill:T.textMuted},tickFormatter:v=>v>0?`第${v}期`:""}),React.createElement(Tooltip,{contentStyle:{borderRadius:8,fontSize:12}}),React.createElement(Legend,{wrapperStyle:{fontSize:11}}),React.createElement(Line,{type:"stepAfter",dataKey:"上肢",stroke:"#4A6B5D",strokeWidth:2.5,dot:{r:3}}),React.createElement(Line,{type:"stepAfter",dataKey:"手指",stroke:"#8BA888",strokeWidth:2.5,dot:{r:3}}),React.createElement(Line,{type:"stepAfter",dataKey:"下肢",stroke:T.yellow,strokeWidth:2.5,dot:{r:3}})))),
-        card("握力與踝背屈進展", React.createElement(ResponsiveContainer,{width:"100%",height:200},React.createElement(LineChart,{data:gripAnkleTrend},React.createElement(CartesianGrid,{strokeDasharray:"3 3",stroke:T.border}),React.createElement(XAxis,{dataKey:"date",fontSize:10,tick:{fill:T.textMuted}}),React.createElement(YAxis,{domain:[0,3],fontSize:10,tick:{fill:T.textMuted},tickFormatter:v=>["無","微動","可動","正常"][v]||""}),React.createElement(Tooltip,{contentStyle:{borderRadius:8,fontSize:12}}),React.createElement(Legend,{wrapperStyle:{fontSize:11}}),React.createElement(Line,{type:"stepAfter",dataKey:"握力",stroke:"#4A6B5D",strokeWidth:2.5,dot:{r:3}}),React.createElement(Line,{type:"stepAfter",dataKey:"踝背屈",stroke:T.red,strokeWidth:2.5,dot:{r:3}})))),
-        card("情緒 · 睡眠 · 配合度", React.createElement(ResponsiveContainer,{width:"100%",height:200},React.createElement(BarChart,{data:moodTrend},React.createElement(CartesianGrid,{strokeDasharray:"3 3",stroke:T.border}),React.createElement(XAxis,{dataKey:"date",fontSize:10,tick:{fill:T.textMuted}}),React.createElement(YAxis,{domain:[0,4],fontSize:10,tick:{fill:T.textMuted}}),React.createElement(Tooltip,{contentStyle:{borderRadius:8,fontSize:12}}),React.createElement(Legend,{wrapperStyle:{fontSize:11}}),React.createElement(Bar,{dataKey:"情緒",fill:"#4A6B5D",radius:[3,3,0,0]}),React.createElement(Bar,{dataKey:"睡眠",fill:"#8BA888",radius:[3,3,0,0]}),React.createElement(Bar,{dataKey:"配合度",fill:T.yellow,radius:[3,3,0,0]})))),
-        latest && card("最新狀態總覽", React.createElement(ResponsiveContainer,{width:"100%",height:280},React.createElement(RadarChart,{data:radarData},React.createElement(PolarGrid,{stroke:T.border}),React.createElement(PolarAngleAxis,{dataKey:"item",fontSize:11,tick:{fill:T.textSec}}),React.createElement(PolarRadiusAxis,{domain:[0,3.5],tick:false,axisLine:false}),React.createElement(Radar,{dataKey:"score",stroke:T.accent,fill:T.accent,fillOpacity:0.2,strokeWidth:2}))))
-      ),
-
-      // WEEKLY
-      tab==="weekly" && React.createElement("div",{},
-        weeklyData.map(w => {
-          const ap=+w.avgPain; const lr=w.records[w.records.length-1]; const fr=w.records[0]; const ch=[];
-          if(ML[lr.rollOver]>ML[fr.rollOver])ch.push("翻身↑");if(ML[lr.sitUp]>ML[fr.sitUp])ch.push("坐起↑");
-          if(ML[lr.standing]>ML[fr.standing])ch.push("站立↑");if(WL[lr.walking]>WL[fr.walking])ch.push("行走↑");
-          if(BM[lr.brunnUpper]>BM[fr.brunnUpper])ch.push("上肢分期↑");if(BM[lr.brunnFinger]>BM[fr.brunnFinger])ch.push("手指分期↑");
-          if(BM[lr.brunnLower]>BM[fr.brunnLower])ch.push("下肢分期↑");if(GM[lr.gripStrength]>GM[fr.gripStrength])ch.push("握力↑");
-          if(AM[lr.ankleDorsi]>AM[fr.ankleDorsi])ch.push("踝背屈↑");
-          return React.createElement("div",{key:w.week,style:{background:T.card,borderRadius:14,padding:"16px",boxShadow:T.shadow,marginBottom:14}},
-            React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}},
-              React.createElement("h3",{style:{margin:0,fontSize:15,fontWeight:700,fontFamily:"'Noto Serif TC',serif"}},w.label),
-              React.createElement("span",{style:{fontSize:11,color:T.textMuted}},w.days+" 天紀錄")
-            ),
-            React.createElement("div",{style:{display:"flex",flexWrap:"wrap",gap:6,marginBottom:10}},
-              tag(`平均疼痛 ${w.avgPain}`, ap<=3?"#EEF5F1":ap<=6?"#FDF6F0":"#FCEEED", ap<=3?T.green:ap<=6?T.yellow:T.red),
-              tag(`上肢${lr.brunnUpper} · 下肢${lr.brunnLower}`,"#EEF5F1",T.accent)
-            ),
-            ch.length>0 && React.createElement("div",{style:{fontSize:12,marginBottom:6,color:T.green,fontWeight:600}},"▲ "+ch.join("、")),
-            React.createElement("div",{style:{fontSize:11,color:T.textMuted}},`週末狀態：${lr.walking} · 站立${lr.standing} · 握力${lr.gripStrength}`),
-            React.createElement("div",{style:{marginTop:8}},React.createElement(ResponsiveContainer,{width:"100%",height:50},React.createElement(LineChart,{data:w.records.map(r=>({d:fmt(r.date),p:r.painScore}))},React.createElement(Line,{type:"monotone",dataKey:"p",stroke:T.red,strokeWidth:1.5,dot:{r:2,fill:T.red}}),React.createElement(XAxis,{dataKey:"d",hide:true}),React.createElement(YAxis,{domain:[0,10],hide:true}))))
-          );
-        })
-      )
-    ),
-
-    // Toast
-    toast && React.createElement("div",{style:{position:"fixed",bottom:24,left:"50%",transform:"translateX(-50%)",background:T.accent,color:"#fff",padding:"10px 22px",borderRadius:24,fontSize:13,fontWeight:600,boxShadow:"0 4px 16px rgba(0,0,0,0.12)",animation:"fadeUp 0.3s"}},toast)
-  );
-}
-
-ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
-</script>
-</body>
-</html>
+        )
+    );
