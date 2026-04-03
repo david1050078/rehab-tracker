@@ -216,12 +216,12 @@ function App() {
           React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:14}},
             React.createElement("div",{},
               React.createElement("h2",{style:{margin:0,fontSize:18,fontFamily:"'Noto Serif TC',serif"}},"個案 A"),
-              React.createElement("div",{style:{fontSize:12,color:T.textSec,marginTop:2}},"56 歲 · 男 · 173cm / 70kg · BMI "+(70/1.73/1.73).toFixed(1))
+              React.createElement("div",{style:{fontSize:12,color:T.textSec,marginTop:2}},"個案 A · 男 · {H}cm / {W}kg · BMI 穩定"
             ),
             React.createElement("div",{style:{background:T.accent,color:"#fff",padding:"6px 14px",borderRadius:20,fontSize:13,fontWeight:700,fontFamily:"'DM Mono',monospace"}},`Day ${strokeDay}`)
           ),
           React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"8px 16px",fontSize:12,color:T.textSec}},
-            ...["診斷　急性腦出血中風","出血位置　右側前額葉","影響側　左側偏癱","治療方式　保守治療","主治醫師　劉醫師","慣用手　右手","輔具　輪椅、四角拐","吞嚥/語言/認知　皆正常"].map((t,i)=>React.createElement("div",{key:i},React.createElement("strong",{style:{color:T.text}},t.split("　")[0]),`　${t.split("　")[1]}`))
+            ...["診斷　急性腦出血中風","出血位置　右側前額葉","影響側　左側偏癱","治療方式　保守治療","主治醫師　醫師","慣用手　未確認","輔具　尚未確認","吞嚥/語言/認知　尚未確認"].map((t,i)=>React.createElement("div",{key:i},React.createElement("strong",{style:{color:T.text}},t.split("　")[0]),`　${t.split("　")[1]}`))
           )
         ),
         alertBox,
